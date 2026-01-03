@@ -35,18 +35,42 @@ export const useChatDropzone = () => {
     .filter((f) => !chatFiles?.some((chatFile) => chatFile?.fileName === f?.name));
 
   const getFileSlots = () => {
-    return userBucket?.extensions.map((x) => {
-      const maxFiles = x.maxFiles ?? Number.MAX_SAFE_INTEGER;
+    return userBucket?.extensions.map((extension) => {
+      const maxFiles = extension.maxFiles ?? Number.MAX_SAFE_INTEGER;
 
-      const extUploadingFiles = filterFilesByFileNameExtensions(uploadingFiles, x.fileNameExtensions);
-      const extConversationFiles = filterFilesByFileNameExtensions(chatFiles, x.fileNameExtensions);
+      // Use the same logic as handleUploadFile to correctly assign files to extensions
+      // Filter files that belong to this extension:
+      // - If extension has specific file types, only count those
+      // - If extension accepts all file types (empty array), only count files that don't match other extensions
+      const extUploadingFiles = uploadingFiles.filter(
+        (file) =>
+          extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)) ||
+          (!extension.fileNameExtensions.length &&
+            !userBucket?.extensions.find(
+              (other) =>
+                other.extensionId !== extension.extensionId &&
+                other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)),
+            )),
+      );
+
+      const extConversationFiles = chatFiles.filter(
+        (file) =>
+          extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.fileName, fileNameExtension)) ||
+          (!extension.fileNameExtensions.length &&
+            !userBucket?.extensions.find(
+              (other) =>
+                other.extensionId !== extension.extensionId &&
+                other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.fileName, fileNameExtension)),
+            )),
+      );
+
       const remainingSlots = maxFiles - (extUploadingFiles.length + extConversationFiles.length);
       return {
-        extensionTitle: x.title,
-        extensionId: x.extensionId,
+        extensionTitle: extension.title,
+        extensionId: extension.extensionId,
         remainingSlots,
         hasNoFileSlotLeft: remainingSlots <= 0,
-        fileNameExtensions: x.fileNameExtensions,
+        fileNameExtensions: extension.fileNameExtensions,
         maxFiles: maxFiles,
       };
     });
@@ -89,8 +113,30 @@ export const useChatDropzone = () => {
       );
 
       const maxFiles = extension.maxFiles ?? Number.MAX_SAFE_INTEGER;
-      const extUploadingFiles = filterFilesByFileNameExtensions(uploadingFiles, extension.fileNameExtensions);
-      const extConversationFiles = filterFilesByFileNameExtensions(chatFiles, extension.fileNameExtensions);
+
+      // Use the same corrected logic to calculate remaining slots
+      const extUploadingFiles = uploadingFiles.filter(
+        (file) =>
+          extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)) ||
+          (!extension.fileNameExtensions.length &&
+            !userBucket?.extensions.find(
+              (other) =>
+                other.extensionId !== extension.extensionId &&
+                other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.name, fileNameExtension)),
+            )),
+      );
+
+      const extConversationFiles = chatFiles.filter(
+        (file) =>
+          extension.fileNameExtensions.some((fileNameExtension) => matchExtension(file.fileName, fileNameExtension)) ||
+          (!extension.fileNameExtensions.length &&
+            !userBucket?.extensions.find(
+              (other) =>
+                other.extensionId !== extension.extensionId &&
+                other.fileNameExtensions.some((fileNameExtension) => matchExtension(file.fileName, fileNameExtension)),
+            )),
+      );
+
       const remainingSlots = maxFiles - (extUploadingFiles.length + extConversationFiles.length);
 
       const filesForExtensionToUpload = filesForExtension.slice(0, remainingSlots);
