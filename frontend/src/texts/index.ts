@@ -67,7 +67,6 @@ function load() {
       loginText: translate('common.loginText'),
       logout: translate('common.logout'),
       clearConversations: translate('common.clearConversations'),
-      monthlyTokens: translate('common.monthlyTokens'),
       monthlyUserTokens: translate('common.monthlyUserTokens'),
       name: translate('common.name'),
       description: translate('common.description'),

@@ -36,7 +36,6 @@ export const de: typeof en = {
     loginText: 'Mit Benutzername und Passwort anmelden',
     logout: 'Abmelden',
     clearConversations: 'Chatverlauf löschen',
-    monthlyTokens: 'Monatliche Tokens',
     monthlyUserTokens: 'Monatliche Tokens pro Benutzer',
     name: 'Name',
     description: 'Beschreibung',

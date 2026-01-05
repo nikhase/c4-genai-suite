@@ -36,7 +36,6 @@ export const en = {
     loginText: 'Login with username and password',
     logout: 'Logout',
     clearConversations: 'Clear conversations',
-    monthlyTokens: 'Monthly tokens',
     monthlyUserTokens: 'Monthly tokens / User',
     name: 'Name',
     description: 'Description',
